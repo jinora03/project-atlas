@@ -1,0 +1,16 @@
+---
+import DecisionLayout from "@/layouts/DecisionLayout.astro";
+import { getDecisions } from "@/lib/content";
+
+export async function getStaticPaths() {
+  const decisions = await getDecisions();
+  return decisions.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+---
+
+<DecisionLayout entry={entry} />

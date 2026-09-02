@@ -1,0 +1,68 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+import Breadcrumbs from "@/components/atlas/Breadcrumbs.astro";
+import DomainBadge from "@/components/atlas/DomainBadge.astro";
+import RelatedConcepts from "@/components/atlas/RelatedConcepts.astro";
+import type { DecisionEntry } from "@/lib/content";
+import { domainLinks } from "@/lib/content";
+
+interface Props {
+  entry: DecisionEntry;
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const domains = await domainLinks(entry.data.domains);
+const heading = entry.data.question ?? entry.data.title;
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <Breadcrumbs
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Decisions", href: "/decisions" },
+        { label: entry.data.title },
+      ]}
+    />
+
+    <header class="mt-6 max-w-3xl">
+      <div class="atlas-eyebrow">Decision</div>
+      <h1 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+        {heading}
+      </h1>
+      <p class="mt-3 text-lg text-muted-foreground">{entry.data.description}</p>
+      {
+        domains.length > 0 && (
+          <div class="mt-5 flex flex-wrap items-center gap-2">
+            <span class="atlas-eyebrow mr-1">Relevant to</span>
+            {domains.map((d) => (
+              <DomainBadge label={d.label} href={d.href} />
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <div class="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_16rem]">
+      <article class="atlas-prose">
+        <Content />
+      </article>
+
+      <aside class="lg:border-l lg:border-border lg:pl-8">
+        <div class="lg:sticky lg:top-20">
+          <RelatedConcepts ids={entry.data.related} title="Concepts to understand" />
+        </div>
+      </aside>
+    </div>
+
+    <div class="mt-14 border-t border-border pt-8">
+      <a
+        href="/decisions"
+        class="text-sm text-brand transition-colors hover:underline"
+      >
+        ← All decisions
+      </a>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,27 @@
+---
+// A small domain chip. Presentational only: the parent resolves ids to
+// { label, href } via content.ts#domainLinks so a planned (page-less) domain
+// renders as a non-navigable chip.
+interface Props {
+  label: string;
+  href?: string | null;
+}
+const { label, href } = Astro.props;
+const base =
+  "inline-flex items-center rounded-full border border-border bg-muted/60 px-2.5 py-0.5 font-mono text-[0.7rem] tracking-wide text-muted-foreground";
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      class={`${base} transition-colors hover:border-brand/50 hover:text-foreground`}
+    >
+      {label}
+    </a>
+  ) : (
+    <span class={base} title="Planned domain — no page yet">
+      {label}
+    </span>
+  )
+}

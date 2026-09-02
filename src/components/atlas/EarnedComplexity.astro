@@ -1,0 +1,27 @@
+---
+// A signature Atlas prompt shown on optional architectural technologies (spec
+// §6 / §7). It exists to keep one question in front of the reader:
+// "Has the system actually earned this complexity?" — never shown on
+// foundational concepts, where the question makes no sense.
+interface Props {
+  prompt?: string;
+}
+const {
+  prompt = "Has the system actually earned this complexity?",
+} = Astro.props;
+---
+
+<aside
+  class="rounded-lg border border-border border-l-2 border-l-brand bg-muted/40 p-4"
+  role="note"
+>
+  <p class="atlas-eyebrow">Before you reach for this</p>
+  <p class="mt-2 text-[0.95rem] font-medium text-foreground">
+    {prompt}
+  </p>
+  <p class="mt-1.5 text-sm text-muted-foreground">
+    Optional architectural technologies solve specific problems. They also add
+    operational surface, new failure modes and cognitive load. Reach for one
+    when a concrete problem justifies it — not by default.
+  </p>
+</aside>

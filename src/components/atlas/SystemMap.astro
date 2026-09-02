@@ -1,0 +1,109 @@
+---
+import { getCanonicalGuide, hrefFor } from "@/lib/content";
+
+/*
+  Systems Map (spec §10) — a static, first-version orientation map.
+
+  This is deliberately NOT an interactive graph yet: it is a calm, static flow
+  that shows how a typical request travels through a system, with every node
+  linking to canonical Atlas content. It is an orientation, not a claim that
+  every system has exactly this shape.
+*/
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+const guide = await getCanonicalGuide();
+const guideHref = guide ? hrefFor("guides", guide.id) : "/guides";
+
+type Node = { kind: "node"; label: string; role: string; href: string };
+type Group = {
+  kind: "group";
+  label: string;
+  role: string;
+  nodes: { label: string; role: string; href: string }[];
+};
+
+const flow: (Node | Group)[] = [
+  { kind: "node", label: "Client", role: "Browser, mobile, API consumer", href: guideHref },
+  { kind: "node", label: "DNS / Networking", role: "Name resolution & routing", href: "/concepts/dns" },
+  { kind: "node", label: "Edge / CDN", role: "Cache & deliver near the user", href: "/concepts/cdn" },
+  { kind: "node", label: "Load Balancer / Reverse Proxy", role: "Spread traffic, terminate TLS", href: "/concepts/load-balancing" },
+  { kind: "node", label: "Application", role: "Business logic & request handling", href: "/domains/backend" },
+  {
+    kind: "group",
+    label: "Data",
+    role: "State, persistence & work that outlives a request",
+    nodes: [
+      { label: "Database", role: "Durable source of truth", href: "/domains/data" },
+      { label: "Cache", role: "Fast, disposable copies", href: "/concepts/caching" },
+      { label: "Async Work", role: "Queues & background jobs", href: guideHref },
+    ],
+  },
+  { kind: "node", label: "Infrastructure / Deployment", role: "Where & how it runs", href: "/domains/platform" },
+  { kind: "node", label: "Observability / Reliability", role: "Metrics, logs, traces, SLOs", href: guideHref },
+];
+---
+
+<div class={`mx-auto flex w-full max-w-md flex-col ${className ?? ""}`}>
+  {
+    flow.map((item, i) => (
+      <>
+        {i > 0 && (
+          <div class="flex justify-center py-1.5" aria-hidden="true">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="text-border"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
+        )}
+
+        {item.kind === "node" ? (
+          <a
+            href={item.href}
+            class="group block rounded-lg border border-border bg-card px-4 py-3 text-center transition-colors hover:border-brand/50"
+          >
+            <span class="block text-sm font-medium transition-colors group-hover:text-brand">
+              {item.label}
+            </span>
+            <span class="mt-0.5 block text-xs text-muted-foreground">
+              {item.role}
+            </span>
+          </a>
+        ) : (
+          <div class="rounded-lg border border-dashed border-border bg-card/50 p-3">
+            <div class="mb-2.5 text-center">
+              <span class="atlas-eyebrow">{item.label}</span>
+              <p class="mt-1 text-xs text-muted-foreground">{item.role}</p>
+            </div>
+            <div class="grid gap-2 sm:grid-cols-3">
+              {item.nodes.map((n) => (
+                <a
+                  href={n.href}
+                  class="group block rounded-md border border-border bg-card px-3 py-2.5 text-center transition-colors hover:border-brand/50"
+                >
+                  <span class="block text-sm font-medium transition-colors group-hover:text-brand">
+                    {n.label}
+                  </span>
+                  <span class="mt-0.5 block text-[0.7rem] text-muted-foreground">
+                    {n.role}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </>
+    ))
+  }
+</div>

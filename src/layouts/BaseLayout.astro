@@ -1,0 +1,76 @@
+---
+import "@/styles/global.css";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title,
+  description = "An interactive atlas of software engineering — understand how software systems fit together, where things belong, and when their complexity is justified.",
+} = Astro.props;
+
+const fullTitle = title
+  ? `${title} · Software Engineering Atlas`
+  : "Software Engineering Atlas — Understand how software systems fit together";
+
+const canonical = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).href
+  : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Set theme + platform before first paint (avoids theme flash and shows
+         the correct ⌘/Ctrl modifier glyph immediately). -->
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem("atlas-theme");
+          if (
+            t === "dark" ||
+            (!t &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches)
+          ) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+        try {
+          var p = navigator.platform || navigator.userAgent || "";
+          if (/Mac|iPhone|iPad|iPod/.test(p)) {
+            document.documentElement.classList.add("is-mac");
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:border focus:border-border focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:shadow"
+    >
+      Skip to content
+    </a>
+    <Header />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

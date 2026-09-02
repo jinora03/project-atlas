@@ -1,0 +1,25 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHeader from "@/components/atlas/PageHeader.astro";
+import DecisionCard from "@/components/atlas/DecisionCard.astro";
+import { getDecisions } from "@/lib/content";
+
+const decisions = await getDecisions();
+---
+
+<BaseLayout
+  title="Decisions"
+  description="Decision-oriented guidance — should I use this thing, and when should I not?"
+>
+  <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <PageHeader
+      eyebrow="Browse"
+      title="Decisions"
+      description="Should I use this thing? Decision guides weigh when a technology or pattern is justified — and, just as importantly, when it is not."
+    />
+
+    <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {decisions.map((d) => <DecisionCard entry={d} />)}
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,119 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+import Breadcrumbs from "@/components/atlas/Breadcrumbs.astro";
+import ConceptCard from "@/components/atlas/ConceptCard.astro";
+import DecisionCard from "@/components/atlas/DecisionCard.astro";
+import GuideCard from "@/components/atlas/GuideCard.astro";
+import type { DomainEntry } from "@/lib/content";
+import { conceptsInDomain, decisionsInDomain, guidesInDomain } from "@/lib/content";
+
+interface Props {
+  entry: DomainEntry;
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+// Domains aggregate canonical content by relevance — they never own it.
+const concepts = await conceptsInDomain(entry.id);
+const decisions = await decisionsInDomain(entry.id);
+const guides = await guidesInDomain(entry.id);
+const areas = entry.data.areas;
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <Breadcrumbs
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Domains", href: "/domains" },
+        { label: entry.data.title },
+      ]}
+    />
+
+    <header class="mt-6 max-w-3xl">
+      <div class="atlas-eyebrow">Domain</div>
+      <h1 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+        {entry.data.title}
+      </h1>
+      <p class="mt-3 text-lg text-muted-foreground">{entry.data.description}</p>
+    </header>
+
+    <div class="atlas-prose mt-8">
+      <Content />
+    </div>
+
+    {
+      areas.length > 0 && (
+        <section class="mt-14">
+          <h2 class="atlas-eyebrow">Important areas</h2>
+          <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            {areas.map((a) => (
+              <div class="rounded-lg border border-border bg-card p-4">
+                <h3 class="text-sm font-semibold">{a.title}</h3>
+                <p class="mt-1 text-sm text-muted-foreground">{a.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <section class="mt-14">
+      <div class="flex items-baseline justify-between">
+        <h2 class="atlas-eyebrow">Concepts in this domain</h2>
+        <span class="font-mono text-xs text-muted-foreground">
+          {concepts.length}
+        </span>
+      </div>
+      {
+        concepts.length > 0 ? (
+          <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {concepts.map((c) => (
+              <ConceptCard entry={c} />
+            ))}
+          </div>
+        ) : (
+          <p class="mt-4 text-sm text-muted-foreground">
+            No concepts reference this domain yet.
+          </p>
+        )
+      }
+    </section>
+
+    {
+      guides.length > 0 && (
+        <section class="mt-14">
+          <h2 class="atlas-eyebrow">Relevant guides</h2>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            {guides.map((g) => (
+              <GuideCard entry={g} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      decisions.length > 0 && (
+        <section class="mt-14">
+          <h2 class="atlas-eyebrow">Relevant decisions</h2>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {decisions.map((d) => (
+              <DecisionCard entry={d} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <div class="mt-14 border-t border-border pt-8">
+      <a
+        href="/domains"
+        class="text-sm text-brand transition-colors hover:underline"
+      >
+        ← All domains
+      </a>
+    </div>
+  </div>
+</BaseLayout>

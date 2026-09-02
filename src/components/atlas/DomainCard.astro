@@ -1,0 +1,43 @@
+---
+import type { DomainEntry } from "@/lib/content";
+import { conceptsInDomain, decisionsInDomain, hrefFor } from "@/lib/content";
+
+interface Props {
+  entry: DomainEntry;
+}
+const { entry } = Astro.props;
+const href = hrefFor("domains", entry.id);
+const conceptCount = (await conceptsInDomain(entry.id)).length;
+const decisionCount = (await decisionsInDomain(entry.id)).length;
+---
+
+<article
+  class="group flex h-full flex-col gap-3 rounded-lg border border-border bg-card p-5 transition-colors hover:border-brand/40"
+>
+  <div
+    class="font-mono text-[0.68rem] uppercase tracking-wider text-muted-foreground"
+  >
+    Domain
+  </div>
+  <h3 class="text-lg font-semibold tracking-tight">
+    <a href={href} class="transition-colors group-hover:text-brand">
+      {entry.data.title}
+    </a>
+  </h3>
+  <p class="line-clamp-3 text-sm text-muted-foreground">
+    {entry.data.description}
+  </p>
+  <div
+    class="mt-auto flex items-center gap-3 pt-1 font-mono text-xs text-muted-foreground"
+  >
+    <span>{conceptCount} concepts</span>
+    {
+      decisionCount > 0 && (
+        <>
+          <span aria-hidden="true" class="text-border">·</span>
+          <span>{decisionCount} decisions</span>
+        </>
+      )
+    }
+  </div>
+</article>

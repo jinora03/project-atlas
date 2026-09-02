@@ -1,0 +1,108 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHeader from "@/components/atlas/PageHeader.astro";
+import AtlasSearch from "@/components/atlas/AtlasSearch.tsx";
+import {
+  getConcepts,
+  getDomains,
+  getDecisions,
+  getGuides,
+  hrefFor,
+} from "@/lib/content";
+
+const [concepts, domains, decisions, guides] = await Promise.all([
+  getConcepts(),
+  getDomains(),
+  getDecisions(),
+  getGuides(),
+]);
+
+const groups = [
+  {
+    label: "Guides",
+    items: guides.map((g) => ({
+      title: g.data.title,
+      href: hrefFor("guides", g.id),
+      description: g.data.description,
+    })),
+  },
+  {
+    label: "Domains",
+    items: domains.map((d) => ({
+      title: d.data.title,
+      href: hrefFor("domains", d.id),
+      description: d.data.description,
+    })),
+  },
+  {
+    label: "Concepts",
+    items: concepts.map((c) => ({
+      title: c.data.title,
+      href: hrefFor("concepts", c.id),
+      description: c.data.description,
+    })),
+  },
+  {
+    label: "Decisions",
+    items: decisions.map((d) => ({
+      title: d.data.question ?? d.data.title,
+      href: hrefFor("decisions", d.id),
+      description: d.data.description,
+    })),
+  },
+].filter((g) => g.items.length > 0);
+---
+
+<BaseLayout
+  title="Search"
+  description="Search across concepts, domains, decisions and guides."
+>
+  <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <PageHeader
+      eyebrow="Search"
+      title="Search the Atlas"
+      description="Full-text search across concepts, domains, decisions and guides. Everything runs in your browser — no server, no tracking."
+    />
+
+    <div class="mt-8 max-w-2xl">
+      <AtlasSearch mode="inline" client:load />
+      <p class="mt-3 text-xs text-muted-foreground">
+        Tip: press <kbd
+          class="rounded border border-border bg-muted px-1.5 py-0.5 font-mono"
+          ><span class="mod-mac">⌘</span><span class="mod-other">Ctrl&nbsp;</span
+          >K</kbd
+        > anywhere to open quick search.
+      </p>
+    </div>
+
+    <section class="mt-16">
+      <h2 class="atlas-eyebrow">Browse everything</h2>
+      <div class="mt-5 grid gap-x-10 gap-y-10 md:grid-cols-2">
+        {
+          groups.map((group) => (
+            <div>
+              <h3 class="text-sm font-semibold">{group.label}</h3>
+              <ul class="mt-3 divide-y divide-border border-t border-border">
+                {group.items.map((item) => (
+                  <li>
+                    <a
+                      href={item.href}
+                      class="group block py-3 transition-colors"
+                    >
+                      <span class="text-sm font-medium transition-colors group-hover:text-brand">
+                        {item.title}
+                      </span>
+                      <span class="mt-0.5 block text-xs text-muted-foreground">
+                        {item.description}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</BaseLayout>

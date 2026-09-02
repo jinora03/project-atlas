@@ -1,0 +1,18 @@
+{
+  "_comment": "Intentionally-planned references. Ids here are treated by `npm run validate` as deliberate (shown in the UI as 'planned'), not typos. Move an id out of this list once its real content file exists.",
+  "concepts": [
+    "locking",
+    "invalidation",
+    "health-checks",
+    "websockets",
+    "pub-sub",
+    "replication"
+  ],
+  "domains": [
+    "systems",
+    "mobile",
+    "desktop",
+    "frontend",
+    "networking"
+  ]
+}

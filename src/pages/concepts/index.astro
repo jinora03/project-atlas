@@ -1,0 +1,50 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHeader from "@/components/atlas/PageHeader.astro";
+import ConceptCard from "@/components/atlas/ConceptCard.astro";
+import { getConcepts } from "@/lib/content";
+
+const concepts = await getConcepts();
+const foundational = concepts.filter((c) => c.data.type === "foundational");
+const architectural = concepts.filter((c) => c.data.type === "architectural");
+---
+
+<BaseLayout
+  title="Concepts"
+  description="Canonical, reusable explanations of the building blocks of software systems."
+>
+  <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <PageHeader
+      eyebrow="Browse"
+      title="Concepts"
+      description="Canonical, reusable explanations. Each concept is understood in its own right — domains reference concepts by relevance, they do not own them."
+    />
+
+    <section class="mt-12">
+      <h2 class="atlas-eyebrow">Foundational</h2>
+      <p class="mt-1 max-w-2xl text-sm text-muted-foreground">
+        The building blocks — what they are, how they work, and how they fail.
+      </p>
+      <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {foundational.map((c) => <ConceptCard entry={c} />)}
+      </div>
+    </section>
+
+    {
+      architectural.length > 0 && (
+        <section class="mt-14">
+          <h2 class="atlas-eyebrow">Architectural</h2>
+          <p class="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Optional technologies and choices. These solve specific problems and
+            add real cost — they should earn their place.
+          </p>
+          <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {architectural.map((c) => (
+              <ConceptCard entry={c} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>

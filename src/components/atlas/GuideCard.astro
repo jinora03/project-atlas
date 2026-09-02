@@ -1,0 +1,38 @@
+---
+import type { GuideEntry } from "@/lib/content";
+import { hrefFor } from "@/lib/content";
+
+interface Props {
+  entry: GuideEntry;
+}
+const { entry } = Astro.props;
+const href = hrefFor("guides", entry.id);
+---
+
+<article
+  class="group flex h-full flex-col gap-3 rounded-lg border border-border bg-card p-5 transition-colors hover:border-brand/40"
+>
+  <div
+    class="flex items-center gap-2 font-mono text-[0.68rem] uppercase tracking-wider text-muted-foreground"
+  >
+    <span>Guide</span>
+    {
+      entry.data.canonical && (
+        <>
+          <span aria-hidden="true" class="text-border">
+            ·
+          </span>
+          <span class="text-brand">canonical</span>
+        </>
+      )
+    }
+  </div>
+  <h3 class="text-lg font-semibold tracking-tight">
+    <a href={href} class="transition-colors group-hover:text-brand">
+      {entry.data.title}
+    </a>
+  </h3>
+  <p class="line-clamp-3 text-sm text-muted-foreground">
+    {entry.data.description}
+  </p>
+</article>

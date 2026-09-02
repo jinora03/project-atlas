@@ -1,0 +1,87 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+import AtlasSearch from "./atlas/AtlasSearch.tsx";
+import MobileNav from "./atlas/MobileNav.tsx";
+
+// Primary navigation (spec §8). "Search" is the command palette on the right
+// rather than a text link; the mobile drawer also exposes it as /search.
+const navItems = [
+  { label: "Explore", href: "/systems-map" },
+  { label: "Systems Guide", href: "/guides" },
+  { label: "Domains", href: "/domains" },
+  { label: "Concepts", href: "/concepts" },
+  { label: "Decisions", href: "/decisions" },
+];
+const mobileItems = [...navItems, { label: "Search", href: "/search" }];
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+---
+
+<header
+  class="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70"
+>
+  <div class="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
+    <div class="flex items-center gap-1 md:hidden">
+      <!-- Only hydrate the mobile drawer on mobile viewports (no JS on desktop). -->
+      <MobileNav
+        client:media="(max-width: 767px)"
+        items={mobileItems}
+        pathname={pathname}
+      />
+    </div>
+
+    <a
+      href="/"
+      class="flex items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      aria-label="Software Engineering Atlas — home"
+    >
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="text-brand"
+        aria-hidden="true"
+      >
+        <path d="M3 8c3-3 6-3 9 0s6 3 9 0"></path>
+        <path d="M3 13c3-3 6-3 9 0s6 3 9 0"></path>
+        <path d="M3 18c3-3 6-3 9 0s6 3 9 0"></path>
+      </svg>
+      <span class="font-semibold tracking-tight">
+        <span class="hidden sm:inline">Software Engineering </span>Atlas
+      </span>
+    </a>
+
+    <nav class="ml-4 hidden items-stretch md:flex" aria-label="Primary">
+      {
+        navItems.map((item) => (
+          <a
+            href={item.href}
+            aria-current={isActive(item.href) ? "page" : undefined}
+            class:list={[
+              "relative inline-flex h-14 items-center px-3 text-sm transition-colors",
+              isActive(item.href)
+                ? "font-medium text-foreground after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-brand"
+                : "text-muted-foreground hover:text-foreground",
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="ml-auto flex items-center gap-1.5">
+      <!-- Search hydrates when the browser is idle; the index is fetched only
+           the first time search is opened (see AtlasSearch). -->
+      <AtlasSearch client:idle />
+      <ThemeToggle />
+    </div>
+  </div>
+</header>
